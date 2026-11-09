@@ -1,0 +1,6 @@
+apiVersion: 1
+providers:
+  - name: vecino
+    folder: Vecino SF
+    type: file
+    options: { path: /var/lib/grafana/dashboards }

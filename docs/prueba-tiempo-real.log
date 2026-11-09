@@ -1,0 +1,7 @@
+# docker compose, 3 réplicas, corrida JUSTO DESPUÉS de deploy/bateria_carga.sh (la escucha de Redis tiene que sobrevivir a la carga).
+# 09/11/2026 13:31 · imagen vecino-sf/api:1.2 (un proceso por contenedor)
+réplicas: {'vecino-sf-api-1': '172.19.0.8', 'vecino-sf-api-2': '172.19.0.6', 'vecino-sf-api-3': '172.19.0.7'}
+Ana conectada a vecino-sf-api-1: 6 de 6 cambios de alarma · avisos personales ajenos: 0
+Ana conectada a vecino-sf-api-2: 6 de 6 cambios de alarma · avisos personales ajenos: 0
+Ana conectada a vecino-sf-api-3: 6 de 6 cambios de alarma · avisos personales ajenos: 0
+Juan (conectado a vecino-sf-api-3, el cambio entró por vecino-sf-api-2): aviso de su reclamo recibido = True

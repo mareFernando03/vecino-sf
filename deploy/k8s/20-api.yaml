@@ -1,0 +1,122 @@
+# Backend sin estado: cualquier réplica atiende cualquier pedido, así que escala horizontal.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: vecino-sf
+spec:
+  replicas: 3
+  strategy:
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }    # actualizar sin cortar el servicio
+  selector:
+    matchLabels: { app: api }
+  template:
+    metadata:
+      labels: { app: api }
+      annotations:                                         # Prometheus descubre y mide cada pod
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: /metrics
+    spec:
+      containers:
+        - name: api
+          image: vecino-sf/api:1.2
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef: { name: vecino-config }
+            - secretRef: { name: vecino-secretos }
+            - secretRef: { name: vecino-vapid }            # VAPID_PUBLIC y VAPID_PRIVATE
+          ports: [{ containerPort: 8000 }]
+          resources:                                       # el HPA calcula el % sobre "requests"
+            requests: { cpu: 200m, memory: 192Mi }
+            limits: { cpu: "1", memory: 384Mi }
+          # Las sondas sólo preguntan si el proceso responde (/salud no toca la base). Bajo carga
+          # una réplica tarda más en contestar: se le dan 3 s y 5 intentos antes de reiniciarla,
+          # para no matar réplicas sanas en el pico (pasó en la prueba: docs/prueba-k8s-*.log).
+          readinessProbe:                                  # no recibe tráfico hasta responder
+            httpGet: { path: /salud, port: 8000 }
+            periodSeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:                                   # si se cuelga, Kubernetes la reinicia
+            httpGet: { path: /salud, port: 8000 }
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 5
+          volumeMounts: [{ name: adjuntos, mountPath: /datos/adjuntos }]
+      volumes:
+        # Prototipo: disco local del pod. Producción: almacenamiento de objetos (S3 / Cloud Storage),
+        # porque los adjuntos tienen que verse desde cualquier réplica.
+        - name: adjuntos
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: vecino-sf
+spec:
+  selector: { app: api }
+  ports: [{ port: 8000 }]
+---
+# Autoescalado: entre 3 y 20 réplicas, apuntando a 60 % de CPU promedio.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api
+  namespace: vecino-sf
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: api }
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: { type: Utilization, averageUtilization: 60 }
+  behavior:
+    scaleUp:                                   # sube rápido ante un pico (p. ej. un vencimiento masivo)
+      stabilizationWindowSeconds: 0
+      policies: [{ type: Percent, value: 100, periodSeconds: 30 }]
+    scaleDown:                                 # baja despacio para no oscilar
+      stabilizationWindowSeconds: 300
+      policies: [{ type: Pods, value: 1, periodSeconds: 60 }]
+---
+# Durante un mantenimiento de nodos siempre quedan al menos 2 réplicas en pie.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api
+  namespace: vecino-sf
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels: { app: api }
+---
+# Sensores simulados y avisos programados: exactamente una instancia.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simulador
+  namespace: vecino-sf
+spec:
+  replicas: 1
+  strategy: { type: Recreate }
+  selector:
+    matchLabels: { app: simulador }
+  template:
+    metadata:
+      labels: { app: simulador }
+    spec:
+      containers:
+        - name: simulador
+          image: vecino-sf/api:1.2
+          imagePullPolicy: IfNotPresent
+          command: ["python", "-m", "app.simulador"]
+          envFrom:
+            - configMapRef: { name: vecino-config }
+            - secretRef: { name: vecino-secretos }
+            - secretRef: { name: vecino-vapid }
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { memory: 256Mi }

@@ -1,0 +1,30 @@
+# PRIMERA línea base: la sonda /salud consultaba la base. Bajo carga venció y Kubernetes
+# reinició las 3 réplicas 8 veces en 3 minutos (eventos: 'Liveness probe failed: context deadline exceeded').
+# 09/11/2026 12:56 · HPA min=3 max=3 · imagen vecino-sf/api:1.2 (un proceso por pod, pool 4+2)
+# hora · HPA (cpu actual/objetivo, min, max, réplicas) · conexiones a PostgreSQL
+12:56:24  cpu: 1%/60% 3 3 3  conexiones_bd=8
+12:56:41  cpu: 9%/60% 3 3 3  conexiones_bd=20
+12:56:58  cpu: 32%/60% 3 3 3  conexiones_bd=14
+12:57:15  cpu: 38%/60% 3 3 3  conexiones_bd=20
+12:57:32  cpu: 377%/60% 3 3 3  conexiones_bd=20
+12:57:48  cpu: <unknown>/60% 3 3 3  conexiones_bd=18
+12:58:06  cpu: 192%/60% 3 3 3  conexiones_bd=13
+12:58:22  cpu: 380%/60% 3 3 3  conexiones_bd=18
+12:58:39  cpu: 68%/60% 3 3 3  conexiones_bd=15
+12:58:55  cpu: 68%/60% 3 3 3  conexiones_bd=14
+12:59:12  cpu: <unknown>/60% 3 3 3  conexiones_bd=18
+12:59:29  cpu: <unknown>/60% 3 3 3  conexiones_bd=15
+12:59:45  cpu: <unknown>/60% 3 3 3  conexiones_bd=16
+13:00:01  cpu: 33%/60% 3 3 3  conexiones_bd=11
+
+pedidos atendidos    : 4558 en 197.5 s  = 23 pedidos/s
+latencia             : mediana 149 ms · p95 428 ms · p99 9874 ms
+errores              : 428 {500: 100, 504: 328}
+pedidos atendidos    : 4226 en 197.5 s  = 21 pedidos/s
+latencia             : mediana 144 ms · p95 405 ms · p99 9935 ms
+errores              : 436 {500: 105, 504: 331}
+pedidos atendidos    : 4530 en 197.4 s  = 23 pedidos/s
+latencia             : mediana 137 ms · p95 401 ms · p99 9829 ms
+errores              : 444 {500: 101, 504: 343}
+# errores de base en los logs de la API (too many clients / QueuePool):
+0

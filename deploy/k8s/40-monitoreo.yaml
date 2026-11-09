@@ -1,0 +1,89 @@
+# Prometheus que encuentra solo los pods anotados con prometheus.io/scrape (cada réplica de la
+# API, también las que agrega el HPA). Grafana se instala igual que en docker-compose, apuntando
+# a http://prometheus.vecino-sf:9090. En un clúster gestionado puede usarse el stack de la nube
+# (Managed Prometheus en GKE, Container Insights en AWS) en lugar de estos manifiestos.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+  namespace: vecino-sf
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prometheus
+  namespace: vecino-sf
+rules:
+  - apiGroups: [""]
+    resources: [pods, services, endpoints]
+    verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prometheus
+  namespace: vecino-sf
+subjects: [{ kind: ServiceAccount, name: prometheus, namespace: vecino-sf }]
+roleRef: { apiGroup: rbac.authorization.k8s.io, kind: Role, name: prometheus }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus
+  namespace: vecino-sf
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+    scrape_configs:
+      - job_name: api
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces: { names: [vecino-sf] }
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: "true"
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: instance
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: vecino-sf
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: prometheus }
+  template:
+    metadata:
+      labels: { app: prometheus }
+    spec:
+      serviceAccountName: prometheus
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.55.1
+          args: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.retention.time=15d"]
+          ports: [{ containerPort: 9090 }]
+          volumeMounts: [{ name: config, mountPath: /etc/prometheus }]
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { memory: 512Mi }
+      volumes:
+        - name: config
+          configMap: { name: prometheus }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: vecino-sf
+spec:
+  selector: { app: prometheus }
+  ports: [{ port: 9090 }]

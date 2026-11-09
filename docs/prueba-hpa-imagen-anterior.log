@@ -1,0 +1,57 @@
+# 08/11/2026 · imagen ANTERIOR vecino-sf/api:1.1: 2 procesos por pod y pool 5+10 por proceso, max_connections=100.
+# 20 réplicas x 2 procesos x 15 conexiones superan las 100 de PostgreSQL. Los 45 errores 500 eran 'too many clients already' en los logs de los pods (ese texto no quedó guardado acá).
+--- 17:23:58
+api   Deployment/api   cpu: 4%/60%   3     20    3     83s
+--- 17:24:13
+api   Deployment/api   cpu: 4%/60%   3     20    3     99s
+--- 17:24:29
+api   Deployment/api   cpu: 250%/60%   3     20    3     115s
+--- 17:24:45
+api   Deployment/api   cpu: 348%/60%   3     20    6     2m11s
+--- 17:25:05
+api   Deployment/api   cpu: 274%/60%   3     20    12    2m32s
+--- 17:25:22
+api   Deployment/api   cpu: 142%/60%   3     20    12    2m48s
+--- 17:25:38
+api   Deployment/api   cpu: 121%/60%   3     20    15    3m4s
+--- 17:25:54
+api   Deployment/api   cpu: 106%/60%   3     20    15    3m20s
+--- 17:26:10
+api   Deployment/api   cpu: 103%/60%   3     20    20    3m36s
+--- 17:26:26
+api   Deployment/api   cpu: 66%/60%   3     20    20    3m52s
+--- 17:26:42
+api   Deployment/api   cpu: 52%/60%   3     20    20    4m8s
+--- 17:26:58
+api   Deployment/api   cpu: 57%/60%   3     20    20    4m24s
+--- 17:27:14
+api   Deployment/api   cpu: 58%/60%   3     20    20    4m39s
+pedidos atendidos    : 19689 en 180.9 s  = 109 pedidos/s
+latencia             : mediana 221 ms · p95 1090 ms · p99 3148 ms
+errores              : 15 {500: 15}
+pedidos atendidos    : 19067 en 180.7 s  = 106 pedidos/s
+latencia             : mediana 228 ms · p95 1097 ms · p99 3688 ms
+errores              : 19 {500: 19}
+pedidos atendidos    : 18679 en 180.7 s  = 103 pedidos/s
+latencia             : mediana 236 ms · p95 1109 ms · p99 3721 ms
+errores              : 11 {500: 11}
+NAME    STATUS     COMPLETIONS   DURATION   AGE
+carga   Complete   3/3           3m5s       3m38s
+api   Deployment/api   cpu: 30%/60%   3     20    20    4m53s
+--- 17:27:30
+api   Deployment/api   cpu: 30%/60%   3     20    20    4m55s
+--- 17:27:45
+api   Deployment/api   cpu: 3%/60%   3     20    20    5m11s
+--- 17:28:01
+api   Deployment/api   cpu: 3%/60%   3     20    20    5m27s
+--- 17:28:17
+api   Deployment/api   cpu: 3%/60%   3     20    20    5m42s
+--- 17:28:32
+api   Deployment/api   cpu: 2%/60%   3     20    20    5m58s
+api-58df7bbf6f-2wlvj   0/1   Terminating   3 (22s ago)   2m57s
+api-58df7bbf6f-jv596   0/1   Terminating   3 (23s ago)   2m57s
+api-58df7bbf6f-k9v6b   0/1   Terminating   3 (25s ago)   2m57s
+api-58df7bbf6f-ktwxf   0/1   Terminating   3 (51s ago)   3m27s
+api-58df7bbf6f-vd7wd   0/1   Terminating   3 (54s ago)   3m27s
+api-58df7bbf6f-vgv8k   0/1   Terminating   3 (55s ago)   3m27s
+api-58df7bbf6f-w9bfs   0/1   Terminating   3 (25s ago)   2m57s

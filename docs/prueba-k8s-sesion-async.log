@@ -1,0 +1,32 @@
+# TERCERA línea base: get_db async, pero la sesión seguía tomando la conexión al validar el usuario
+# y la retenía mientras el pedido esperaba un hilo. Mismo bloqueo.
+# 09/11/2026 13:07 · HPA min=3 max=3 · imagen vecino-sf/api:1.2 (un proceso por pod, pool 4+2)
+# hora · HPA (cpu actual/objetivo, min, max, réplicas) · conexiones a PostgreSQL
+13:07:05  cpu: <unknown>/60% 3 3 3  conexiones_bd=17
+13:07:21  cpu: 38%/60% 3 3 3  conexiones_bd=22
+13:07:38  cpu: 23%/60% 3 3 3  conexiones_bd=16
+13:07:54  cpu: 20%/60% 3 3 3  conexiones_bd=16
+13:08:11  cpu: 18%/60% 3 3 3  conexiones_bd=16
+13:08:27  cpu: 22%/60% 3 3 3  conexiones_bd=16
+13:08:44  cpu: 22%/60% 3 3 3  conexiones_bd=16
+13:09:01  cpu: 18%/60% 3 3 3  conexiones_bd=16
+13:09:17  cpu: 22%/60% 3 3 3  conexiones_bd=16
+13:09:34  cpu: 19%/60% 3 3 3  conexiones_bd=16
+13:09:50  cpu: 16%/60% 3 3 3  conexiones_bd=16
+13:10:07  cpu: 27%/60% 3 3 3  conexiones_bd=16
+13:10:24  cpu: 16%/60% 3 3 3  conexiones_bd=16
+13:10:41  cpu: 12%/60% 3 3 3  conexiones_bd=16
+13:10:57  cpu: 9%/60% 3 3 3  conexiones_bd=16
+13:11:14  cpu: 6%/60% 3 3 3  conexiones_bd=16
+
+pedidos atendidos    : 1195 en 236.1 s  = 5 pedidos/s
+latencia             : mediana 10 ms · p95 195 ms · p99 452 ms
+errores              : 539 {500: 15, 504: 524}
+pedidos atendidos    : 1140 en 226.0 s  = 5 pedidos/s
+latencia             : mediana 11 ms · p95 219 ms · p99 356 ms
+errores              : 516 {500: 11, 504: 505}
+pedidos atendidos    : 1017 en 235.9 s  = 4 pedidos/s
+latencia             : mediana 11 ms · p95 245 ms · p99 365 ms
+errores              : 531 {500: 11, 504: 520}
+# errores de base en los logs de la API (too many clients / QueuePool):
+372

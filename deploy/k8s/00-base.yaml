@@ -1,0 +1,31 @@
+# Espacio de nombres, configuración y secretos.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vecino-sf
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vecino-config
+  namespace: vecino-sf
+data:
+  DATABASE_URL: postgresql+psycopg://vecino:vecino@postgres:5432/vecino
+  REDIS_URL: redis://redis:6379/0
+  UPLOAD_DIR: /datos/adjuntos
+  # 20 réplicas × (4 + 2) = 120 conexiones, debajo del max_connections=150 de PostgreSQL.
+  DB_POOL: "4"
+  DB_OVERFLOW: "2"
+---
+# En producción estos valores no se versionan: se cargan con `kubectl create secret` o desde
+# un gestor de secretos (Secret Manager, Vault). Acá van de ejemplo para que el clúster arranque.
+# Las claves VAPID se generan aparte (ver README.md) y van en el Secret vecino-vapid.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vecino-secretos
+  namespace: vecino-sf
+type: Opaque
+stringData:
+  JWT_SECRET: cambiar-en-produccion
+  POSTGRES_PASSWORD: vecino

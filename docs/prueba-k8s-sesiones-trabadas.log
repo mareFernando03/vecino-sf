@@ -1,0 +1,32 @@
+# SEGUNDA línea base: sondas ya sin base, pero get_db síncrono. Las sesiones quedaban
+# 'idle in transaction' esperando un hilo para cerrarse (pg_stat_activity) y el servicio se trabó.
+# 09/11/2026 13:01 · HPA min=3 max=3 · imagen vecino-sf/api:1.2 (un proceso por pod, pool 4+2)
+# hora · HPA (cpu actual/objetivo, min, max, réplicas) · conexiones a PostgreSQL
+13:01:36  cpu: <unknown>/60% 3 3 3  conexiones_bd=10
+13:01:52  cpu: 87%/60% 3 3 3  conexiones_bd=15
+13:02:09  cpu: 46%/60% 3 3 3  conexiones_bd=16
+13:02:25  cpu: 26%/60% 3 3 3  conexiones_bd=16
+13:02:42  cpu: 27%/60% 3 3 3  conexiones_bd=16
+13:02:58  cpu: 20%/60% 3 3 3  conexiones_bd=16
+13:03:15  cpu: 18%/60% 3 3 3  conexiones_bd=16
+13:03:31  cpu: 18%/60% 3 3 3  conexiones_bd=16
+13:03:48  cpu: 16%/60% 3 3 3  conexiones_bd=16
+13:04:04  cpu: 23%/60% 3 3 3  conexiones_bd=16
+13:04:21  cpu: 22%/60% 3 3 3  conexiones_bd=16
+13:04:37  cpu: 20%/60% 3 3 3  conexiones_bd=16
+13:04:54  cpu: 18%/60% 3 3 3  conexiones_bd=16
+13:05:10  cpu: 16%/60% 3 3 3  conexiones_bd=16
+13:05:27  cpu: 6%/60% 3 3 3  conexiones_bd=16
+13:05:43  cpu: 3%/60% 3 3 3  conexiones_bd=16
+
+pedidos atendidos    : 1389 en 213.4 s  = 7 pedidos/s
+latencia             : mediana 12 ms · p95 361 ms · p99 680 ms
+errores              : 507 {500: 5, 504: 502}
+pedidos atendidos    : 1433 en 237.7 s  = 6 pedidos/s
+latencia             : mediana 11 ms · p95 347 ms · p99 613 ms
+errores              : 529 {500: 14, 504: 515}
+pedidos atendidos    : 1359 en 222.2 s  = 6 pedidos/s
+latencia             : mediana 11 ms · p95 365 ms · p99 646 ms
+errores              : 507 {500: 7, 504: 500}
+# errores de base en los logs de la API (too many clients / QueuePool):
+236

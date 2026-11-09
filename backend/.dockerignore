@@ -1,0 +1,6 @@
+__pycache__
+*.db
+adjuntos
+vapid.json
+tests
+.pytest_cache

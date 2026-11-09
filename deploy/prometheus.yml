@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 5s
+scrape_configs:
+  # El DNS de Docker devuelve una IP por réplica: Prometheus mide cada una por separado
+  # y detecta solo las que se agregan al escalar.
+  - job_name: api
+    dns_sd_configs:
+      - names: [api]
+        type: A
+        port: 8000

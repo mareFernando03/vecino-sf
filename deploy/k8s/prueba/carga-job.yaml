@@ -1,0 +1,29 @@
+# Prueba de autoescalado: 3 generadores de carga dentro del clúster durante 3 minutos.
+#   kubectl apply -f deploy/k8s/prueba/carga-job.yaml
+#   kubectl -n vecino-sf get hpa api -w          (mirar cómo suben las réplicas)
+# La imagen vecino-sf/carga:1.0 es python:3.12-slim + httpx, con prueba_carga.py montado desde
+# un ConfigMap que se crea antes (no va en este archivo: aplicarlo de nuevo lo vaciaría):
+#   kubectl -n vecino-sf create configmap prueba-carga --from-file=deploy/prueba_carga.py
+# bash deploy/k8s/prueba/corrida.sh hace todo y deja el registro.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: carga
+  namespace: vecino-sf
+spec:
+  parallelism: 3
+  completions: 3
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: carga
+          image: vecino-sf/carga:1.0
+          imagePullPolicy: IfNotPresent
+          command: ["python", "/w/prueba_carga.py", "--url", "http://web.vecino-sf", "--usuarios", "40", "--segundos", "180"]
+          env: [{ name: PYTHONIOENCODING, value: utf-8 }]
+          volumeMounts: [{ name: script, mountPath: /w }]
+      volumes:
+        - name: script
+          configMap: { name: prueba-carga }

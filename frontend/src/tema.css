@@ -1,0 +1,27 @@
+:root {
+  --ion-color-primary: #1f6f4a;
+  --ion-color-primary-rgb: 31, 111, 74;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-shade: #1b6241;
+  --ion-color-primary-tint: #357d5c;
+}
+
+.grilla-servicios {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 12px;
+}
+.grilla-servicios ion-card { margin: 0; text-align: center; padding: 14px 6px; }
+.grilla-servicios ion-icon { font-size: 34px; color: var(--ion-color-primary); }
+.grilla-servicios h3 { font-size: 14px; margin: 6px 0 0; font-weight: 600; }
+
+.leyenda { display: flex; gap: 12px; font-size: 12px; padding: 6px 12px; flex-wrap: wrap; }
+.leyenda span::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; background: var(--c); }
+
+.temporizador { font-size: 42px; font-weight: 700; text-align: center; font-variant-numeric: tabular-nums; }
+.lector-qr { width: 100%; max-width: 360px; margin: 0 auto; }
+
+@media (min-width: 900px) {
+  .panel { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+}

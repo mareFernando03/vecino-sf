@@ -1,0 +1,33 @@
+# 09/11/2026 13:26 · imagen vecino-sf/api:1.2 (un proceso por contenedor, pool 5+10)
+# docker compose, 1 generador dentro de la red de Docker (60 usuarios, 25 s)
+=== 1 réplica(s)
+usuarios simultáneos : 60
+pedidos atendidos    : 3048 en 26.9 s  = 113 pedidos/s
+latencia             : mediana 527 ms · p95 803 ms · p99 1079 ms
+errores              : 0 
+reparto entre réplicas (60 pedidos): {'dd71473c1425': 60}
+=== 3 réplica(s)
+usuarios simultáneos : 60
+pedidos atendidos    : 5214 en 25.8 s  = 202 pedidos/s
+latencia             : mediana 214 ms · p95 816 ms · p99 1235 ms
+errores              : 0 
+reparto entre réplicas (60 pedidos): {'c3997e446207': 20, 'd5d1f8a91749': 20, 'dd71473c1425': 20}
+=== 6 réplica(s)
+usuarios simultáneos : 60
+pedidos atendidos    : 5244 en 25.9 s  = 202 pedidos/s
+latencia             : mediana 212 ms · p95 814 ms · p99 1229 ms
+errores              : 0 
+reparto entre réplicas (60 pedidos): {'d5d1f8a91749': 10, '190e8473e085': 10, 'b536f58fda3e': 10, '506aa0e2abf8': 10, 'dd71473c1425': 10, 'c3997e446207': 10}
+
+# 3 generadores en paralelo (120 usuarios, 25 s)
+1 réplicas · 3 generadores x 40 usuarios = 120 simultáneos: 131 pedidos/s · mediana 1064 ms · p95 1626 ms (peor generador) · 0 errores
+3 réplicas · 3 generadores x 40 usuarios = 120 simultáneos: 380 pedidos/s · mediana 304 ms · p95 586 ms (peor generador) · 0 errores
+6 réplicas · 3 generadores x 40 usuarios = 120 simultáneos: 418 pedidos/s · mediana 214 ms · p95 784 ms (peor generador) · 0 errores
+
+# Redundancia: 3 réplicas, 60 usuarios, se tira una réplica (docker kill) a los 8 s de empezar.
+# docker kill vecino-sf-api-2 a las 13:31:28
+usuarios simultáneos : 60
+pedidos atendidos    : 5436 en 25.8 s  = 211 pedidos/s
+latencia             : mediana 204 ms · p95 794 ms · p99 1170 ms
+errores              : 0 
+reparto entre réplicas (60 pedidos): {'dd71473c1425': 20, '71eb8b93ddd1': 20, '095aa2c4640c': 20}

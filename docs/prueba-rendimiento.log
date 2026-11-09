@@ -1,0 +1,5 @@
+# 09/11/2026 · frontend/pruebas/rendimiento.mjs sobre `vite preview` (compilación de producción)
+# Celular de gama media simulado: CPU 4x más lenta, red 9 Mbps de bajada / 1,5 Mbps de subida, 170 ms de latencia.
+# "Lista" = la pantalla de ingreso responde (no incluye pantallas con mapa).
+primera visita : primer contenido 1048 ms · pantalla de ingreso lista 1163 ms · 199 KB transferidos
+segunda visita : primer contenido 252 ms · pantalla de ingreso lista 385 ms · 1 KB transferidos

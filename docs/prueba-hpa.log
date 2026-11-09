@@ -1,0 +1,27 @@
+# 09/11/2026 13:15 · HPA min=3 max=20 · imagen vecino-sf/api:1.2 (un proceso por pod, pool 4+2)
+# (imagen previa a la corrección de la escucha de Redis en eventos.py; esa corrección no cambia cómo se atienden los pedidos de la prueba, que no usa tiempo real)
+# hora · HPA (cpu actual/objetivo, min, max, réplicas) · conexiones a PostgreSQL
+13:15:53  cpu: 148%/60% 3 20 3  conexiones_bd=14
+13:16:11  cpu: 1%/60% 3 20 3  conexiones_bd=19
+13:16:28  cpu: 347%/60% 3 20 3  conexiones_bd=26
+13:16:45  cpu: 448%/60% 3 20 6  conexiones_bd=26
+13:17:03  cpu: 289%/60% 3 20 6  conexiones_bd=50
+13:17:21  cpu: 160%/60% 3 20 12  conexiones_bd=50
+13:17:40  cpu: 121%/60% 3 20 20  conexiones_bd=76
+13:17:58  cpu: 91%/60% 3 20 20  conexiones_bd=80
+13:18:16  cpu: 80%/60% 3 20 20  conexiones_bd=81
+13:18:33  cpu: 80%/60% 3 20 20  conexiones_bd=82
+13:18:51  cpu: 83%/60% 3 20 20  conexiones_bd=82
+13:19:07  cpu: 80%/60% 3 20 20  conexiones_bd=82
+
+pedidos atendidos    : 24222 en 180.8 s  = 134 pedidos/s
+latencia             : mediana 189 ms · p95 868 ms · p99 1447 ms
+errores              : 0 
+pedidos atendidos    : 24414 en 181.0 s  = 135 pedidos/s
+latencia             : mediana 188 ms · p95 852 ms · p99 1504 ms
+errores              : 0 
+pedidos atendidos    : 23832 en 181.0 s  = 132 pedidos/s
+latencia             : mediana 193 ms · p95 885 ms · p99 1511 ms
+errores              : 0 
+# errores de base en los logs de la API (too many clients / QueuePool):
+0

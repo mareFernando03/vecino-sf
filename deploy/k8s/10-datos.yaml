@@ -1,0 +1,76 @@
+# PostgreSQL con disco persistente. En la nube se reemplaza por un servicio administrado
+# (Cloud SQL, RDS) y este archivo desaparece.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: vecino-sf
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels: { app: postgres }
+  template:
+    metadata:
+      labels: { app: postgres }
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16.4-alpine
+          args: ["-c", "max_connections=150"]
+          env:
+            - { name: POSTGRES_USER, value: vecino }
+            - { name: POSTGRES_DB, value: vecino }
+            - name: POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: vecino-secretos, key: POSTGRES_PASSWORD } }
+            - { name: PGDATA, value: /var/lib/postgresql/data/pgdata }
+          ports: [{ containerPort: 5432 }]
+          readinessProbe:
+            exec: { command: ["pg_isready", "-U", "vecino"] }
+            periodSeconds: 5
+          volumeMounts: [{ name: datos, mountPath: /var/lib/postgresql/data }]
+  volumeClaimTemplates:
+    - metadata: { name: datos }
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources: { requests: { storage: 5Gi } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: vecino-sf
+spec:
+  selector: { app: postgres }
+  ports: [{ port: 5432 }]
+---
+# Redis: canal de eventos en tiempo real entre réplicas. No guarda datos que no se puedan perder.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: vecino-sf
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: redis }
+  template:
+    metadata:
+      labels: { app: redis }
+    spec:
+      containers:
+        - name: redis
+          image: redis:7.4-alpine
+          ports: [{ containerPort: 6379 }]
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { memory: 128Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: vecino-sf
+spec:
+  selector: { app: redis }
+  ports: [{ port: 6379 }]
